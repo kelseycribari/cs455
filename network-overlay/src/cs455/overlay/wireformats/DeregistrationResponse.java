@@ -2,7 +2,7 @@ package cs455.overlay.wireformats;
 
 import java.io.IOException;
 
-public class MessagingNodesList implements Event {
+public class DeregistrationResponse implements Event {
 
 	@Override
 	public int getEventType() {

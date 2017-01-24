@@ -1,5 +1,25 @@
 package cs455.overlay.wireformats;
 
-public class Message {
+import java.io.IOException;
+
+public class Message implements Event {
+
+	@Override
+	public int getEventType() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public byte[] getBytes() throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Event createNewEvent(byte[] info) throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }
