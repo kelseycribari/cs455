@@ -2,8 +2,16 @@ package cs455.overlay.wireformats;
 
 import java.io.IOException;
 
-public class DeregistrationResponse implements Event {
+public class DeregistrationResponse implements Event, Protocol {
 
+	
+	private int eventType; 
+	
+	public DeregistrationResponse(byte[] marshalledBytes) throws IOException {
+		eventType = DEREGISTRATION_RESPONSE; 
+		
+	}
+	
 	@Override
 	public int getEventType() {
 		// TODO Auto-generated method stub

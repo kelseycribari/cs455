@@ -7,20 +7,22 @@ import java.io.IOException;
 
 public class TCPSender {
 	
-	protected DataOutputStream dout;
+	private DataOutputStream dout;
+	private Socket socket; 
 	
 	public TCPSender(Socket s) throws IOException {
 		dout = new DataOutputStream(s.getOutputStream()); 
+		socket = s; 
 	}
 
-	
-	public synchronized void sendData(byte[] data) throws IOException {
+	//synchronized??
+	public void sendData(byte[] data) throws IOException {
 		
 		int length = data.length; 
 		//first sends length of the data 
 		dout.writeInt(length);
 		//then writes the actual data 
-		dout.write(data);
+		dout.write(data, 0, length);
 		dout.flush(); 
 	}
 }
