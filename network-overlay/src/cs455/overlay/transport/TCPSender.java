@@ -16,7 +16,7 @@ public class TCPSender {
 	}
 
 	//synchronized??
-	public void sendData(byte[] data) throws IOException {
+	public synchronized void sendData(byte[] data) throws IOException {
 		
 		int length = data.length; 
 		//first sends length of the data 

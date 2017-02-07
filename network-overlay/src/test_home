@@ -1,0 +1,8 @@
+test_home=/Users/kelseycribari/Documents/workspace/cs455/network-overlay/src
+gnome-terminal -x bash -c "ssh -t albany.cs.colostate.edu 'echo 'helloworld!'; cd ~/src; java cs455.overlay.node.Registry 23452; bash '" & 
+sleep 2
+for i in `cat ./machine_list` 
+do
+	echo ' logging into '${i}
+	gnome-terminal -x bash -c "ssh -t ${i} 'echo 'helloworld!'; cd ~/src; java cs455.overlay.node.MessagingNode albany 23452; bash '" & 
+done

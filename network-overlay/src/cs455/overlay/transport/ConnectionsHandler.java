@@ -56,7 +56,7 @@ public class ConnectionsHandler extends Thread {
 			try {
 				Socket s = ss.accept(); 
 				//ss.setReuseAddress(true);
-				new Connection(s, node, ss.getLocalPort());
+				//new Connection(s, node, ss.getLocalPort());
 			} catch (IOException e) {
 				System.out.println(e.getMessage());
 				e.printStackTrace();

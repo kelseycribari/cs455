@@ -15,6 +15,10 @@ public class RegistrationResponse implements Event, Protocol {
 	private String information; 
 	private byte status; 
 	
+	public RegistrationResponse() {
+		information = new String(); 
+	}
+	
 	public RegistrationResponse(String info, byte status) {
 		information = info; 
 		this.status = status; 
@@ -28,14 +32,14 @@ public class RegistrationResponse implements Event, Protocol {
 		
 		//get event type from datainputstream
 		eventType = din.readInt(); 
-		
+		status = din.readByte(); 
 		//get length
 		int length = din.readInt();
 		byte[] idbytes = new byte[length];
 		din.readFully(idbytes);
 		
 		information = new String(idbytes);
-		status = din.readByte(); 
+		
 		
 		bainput.close(); 
 		din.close();
@@ -47,6 +51,22 @@ public class RegistrationResponse implements Event, Protocol {
 	public int getEventType() {
 		
 		return eventType;
+	}
+	
+	public void setStatus(byte status) {
+		this.status = status; 
+	}
+	
+	public byte getStatus() {
+		return status; 
+	}
+	
+	public void setInfo(String info) {
+		information = info; 
+	}
+	
+	public String getInfo() {
+		return information; 
 	}
 
 	@Override

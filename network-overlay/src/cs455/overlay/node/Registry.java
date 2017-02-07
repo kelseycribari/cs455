@@ -12,6 +12,7 @@ import cs455.overlay.transport.ConnectionsHandler;
 import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.EventFactory;
+import cs455.overlay.wireformats.EventManager;
 import cs455.overlay.wireformats.Protocol;
 import cs455.overlay.wireformats.Register;
 import cs455.overlay.wireformats.RegistrationResponse;
@@ -28,6 +29,7 @@ public class Registry implements Node {
 	private int messagingNodeConnections; //how many other nodes each node is connected to. 
 	
 	EventFactory eFactory; 
+	//EventManager eventManager; 
 	
 	private int completedTasks; 
 	
@@ -39,13 +41,16 @@ public class Registry implements Node {
 	//private LinkedHashMap<String, Connection> messagingNodes; 
 	
 	public Registry(int port) throws IOException {
-		serverThread = new TCPServerThread(this);
+		System.out.println("Registry constructor with port: " + port);
+		serverThread = new TCPServerThread(this, port);
 		serverThread.start(); 
 		messagingNodes = new Hashtable<String, Connection>(); 
 		completedTasks = 0; 
 		this.port = port; 
 		
-		//set local address 
+		//eventManager = new EventManager(); 
+		
+	 
 	}
 	
 	/*public void start() throws IOException {
@@ -61,13 +66,20 @@ public class Registry implements Node {
 	*/
 	
 	@Override
-	public synchronized void onEvent(Event event, Socket socket) {
-		
+	public synchronized void onEvent(Event event, Socket socket) throws IOException {
+		System.out.println("Are we getting here?");
+		System.out.println("Event type in Registry, onEvent" + event.getEventType());
 		switch(event.getEventType()) {
 		
 		case Protocol.REGISTER_REQUEST: {
 				Register rr = (Register) event;
+				int success = validRegister(rr, socket);
 				//need to validate registration 
+		}
+		
+		case Protocol.REGISTRATION_RESPONSE: {
+			RegistrationResponse regresp = (RegistrationResponse) event; 
+			
 		}
 		
 		//working here on Deregistering 
@@ -83,11 +95,11 @@ public class Registry implements Node {
 		
 		String information;
 		
-		Connection connection = messagingNodes.get(socket.getInetAddress().getCanonicalHostName() + ":" + socket.getPort());
-		connection.setListeningPort(rr.getPort()); //need to add a get port for the register class 
+		Connection connection = messagingNodes.get(socket.getInetAddress().getHostName() + ":" + socket.getPort());
+		connection.setListeningPort(rr.getLocalPort()); //LOCAL PORT OR SERVER PORT? 
 		
 		
-		if (rr.getIP().equals(socket.getInetAddress().getCanonicalHostName())) { //also need a getIP for the register class
+		if (rr.getIP().equals(socket.getInetAddress().getHostName())) { 
 			success = 0; 
 			information = "Successful registration request. There are currently " + 
 							messagingNodes.size() + " messaging nodes in the overlay.";
@@ -99,9 +111,7 @@ public class Registry implements Node {
 							rr.getIP() + " does not match the IP Address of the source: " + socket.getInetAddress().toString();
 		}
 		
-		RegistrationResponse response = new RegistrationResponse(); 
-		response.setSuccess(success); 
-		response.additionalInfo(information);
+		RegistrationResponse response = new RegistrationResponse(information, success); 
 		
 		connection.sendData(response.getBytes());
 		
@@ -122,8 +132,7 @@ public class Registry implements Node {
 	
 
 	//registers new connection with list of connections, not with messagingNodes 
-	@Override
-	public void registerConnection(Connection c) {
+	public synchronized void registerConnection(Connection c) {
 		System.out.println("Registering connection on: " + c.getName());
 		
 		if (!(messagingNodes.containsKey(c.getName()))) {
@@ -136,8 +145,7 @@ public class Registry implements Node {
 
 	
 	//removes connection from list of all connections not from messaging nodes 
-	@Override
-	public void deregisterConnection(Connection c) {
+	public synchronized void deregisterConnection(Connection c) {
 		System.out.println("Deregistering connection on: " + c.getName());
 		messagingNodes.remove(c.getName());
 		
@@ -161,8 +169,10 @@ public static void main (String [] args) throws IOException {
 		try {
 			registry = new Registry(portNumber);
 			//registry.start(); 
+			System.out.println("Registry started and listening on port " + portNumber);
 		} catch (IOException e){
 			System.out.println("ERROR: COULD NOT START REGISTRY");
+			
 			System.exit(0);
 		}
 		

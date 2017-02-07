@@ -33,8 +33,9 @@ public class Connection {
 	
 	
 	public Connection(Socket socket, Node node) throws IOException {
-		IP = socket.getInetAddress().getCanonicalHostName(); 
-		localIP = socket.getLocalAddress().getCanonicalHostName(); 
+		System.out.println("Creating new connection");
+		IP = socket.getInetAddress().getHostName(); 
+		localIP = socket.getLocalAddress().getHostName(); 
 		port = socket.getPort(); 
 		localPort = socket.getLocalPort(); 
 		listeningPort = 0; 

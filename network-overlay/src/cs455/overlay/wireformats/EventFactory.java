@@ -13,7 +13,7 @@ public class EventFactory {
 		return eFactory; 
 	}
 	
-	public static Event createNewEvent(byte[] info) {
+	public synchronized static Event createNewEvent(byte[] info) {
 		
 		Event event = null; 
 		
@@ -24,77 +24,89 @@ public class EventFactory {
 			
 			int eventType = din.readInt(); 
 			
-			din.close(); 
 			bainput.close(); 
+			din.close(); 
 			
+			System.out.println(eventType);
 			
 			switch(eventType) {
 			
 				case Protocol.REGISTER_REQUEST: {
 					event = new Register(info);
-					break;
+					System.out.println(event);
+					
+					return new Register(info);
+					
+					//System.out.println("Hello?");
+					//System.out.println(event.getEventType());
+					//return new Register(info);
+					//return event; 
+					
 				}
 				
 				case Protocol.REGISTRATION_RESPONSE: {
-					event = new RegistrationResponse(info);
-					break;
+					return new RegistrationResponse(info);
+					
 				}
 				
 				case Protocol.DEREGISTER_REQUEST: {
-					event = new Deregister(info);
-					break; 
+					return new Deregister(info);
+					 
 				}
 				
 				case Protocol.DEREGISTRATION_RESPONSE: {
-					event = new DeregistrationResponse(info);
-					break; 
+					return new DeregistrationResponse(info);
+					
 				}
 				
-				case Protocol.MESSAGING_NODES_LIST: {
-					event = new MessagingNodesList(info);
+				/*case Protocol.MESSAGING_NODES_LIST: {
+					//event = new MessagingNodesList(info);
 					break;
 				}
 				
 				case Protocol.LINK_WEIGHTS: {
-					event = new LinkWeights(info);
+					//event = new LinkWeights(info);
 					break; 
 				}
 				
 				case Protocol.TASK_INITIATE: {
-					event = new TaskInitiate(info);
+					//event = new TaskInitiate(info);
 					break; 
 				}
 				
 				case Protocol.TASK_COMPLETE: {
-					event = new TaskComplete(info);
+					//event = new TaskComplete(info);
 					break;
 				}
 				
 				case Protocol.TASK_SUMMARY_REQUEST: {
-					event = new TaskSummaryRequest(info);
+					//event = new TaskSummaryRequest(info);
 					break; 
 				}
 				
 				case Protocol.TASK_SUMMARY_RESPONSE: {
-					event = new TaskSummaryResponse(info);
+					//event = new TaskSummaryResponse(info);
 					break; 
 				}
-				
+				*/
 				case Protocol.MESSAGE: {
-					event = new Message(info); 
-					break; 
+					return new Message(info); 
+				
 				}
 				
 				default: {
-					break; 
+					return null; 
+					 
 				}
 			}
+			
 			
 			
 		} catch (IOException e) {
 			
 		}
-		return event; 
+		return event;
+		 
 	}
 	
 	

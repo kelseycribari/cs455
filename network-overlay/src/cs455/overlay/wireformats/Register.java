@@ -10,28 +10,31 @@ import java.io.IOException;
 
 public class Register implements Event, Protocol {
 
-	private int eventType; 
+	private int eventType = REGISTER_REQUEST; 
 	private String IP; 
 	private int locport; 
-	private int serverPort; 
+	//private int serverPort;
+	private int linkWeight; 
 	
 	
-	public Register(String ipaddr, int lport, int sport) {
-		IP = ipaddr; 
-		locport = lport; 
-		serverPort = sport; 
-		eventType = REGISTER_REQUEST; 
+	public Register(String IPaddr, int lPort) {
+		IP = IPaddr; 
+		locport = lPort; 
+		//serverPort = sPort; 
+		//eventType = REGISTER_REQUEST; 
+		System.out.println("Register Request created!");
 	}
 	
 	public Register(byte[] marshalledBytes) throws IOException {
 		
+		System.out.println("Register constructor with byte[]");
 		ByteArrayInputStream bainput = new ByteArrayInputStream(marshalledBytes);
 		DataInputStream din = new DataInputStream(new BufferedInputStream(bainput));
 		
 		//get event type
 		this.eventType = din.readInt(); 
 		
-		
+		System.out.println(eventType);
 		//first allocate size, then create byte array based on length 
 		int length = din.readInt(); 
 		byte[] idbytes = new byte[length];
@@ -39,18 +42,42 @@ public class Register implements Event, Protocol {
 		
 		IP = new String(idbytes);
 		locport = din.readInt();
-		serverPort = din.readInt(); 
+		Register register = new Register(IP, locport);
+		//serverPort = din.readInt(); 
 		
 		bainput.close(); 
 		din.close(); 
-		
 	}
 	
 	
+	public String getIP() {
+		return IP; 
+	}
 	
+	public void setIP(String IP) {
+		this.IP = IP; 
+	}
+	
+	
+	public int getLocalPort() {
+		return locport; 
+	}
+	
+	public void setLocalPort(int port) {
+		locport = port; 
+	}
+	//public int getServerPort() {
+		//return serverPort; 
+	//}
+	public void setLinkWeight(int weight) {
+		linkWeight = weight; 
+	}
+	
+	public int getLinkWeight() {
+		return linkWeight; 
+	}
 	@Override
 	public int getEventType() {
-		// TODO Auto-generated method stub
 		return eventType;
 	}
 
@@ -74,7 +101,7 @@ public class Register implements Event, Protocol {
 		dout.write(idbytes);
 		
 		dout.write(locport);
-		dout.write(serverPort);
+		//dout.write(serverPort);
 		dout.flush(); 
 		
 		marshalledBytes = baoutput.toByteArray(); 
@@ -86,9 +113,11 @@ public class Register implements Event, Protocol {
 	}
 
 	@Override
-	public Event createNewEvent(byte[] info) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+	public Event createNewEvent(byte[] marshalledBytes) throws IOException {
+		
+		
+		//return register;
+		return null; 
 	}
 
 }
