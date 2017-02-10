@@ -9,21 +9,27 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 
+import cs455.overlay.dijkstra.Vertex;
+
 public class Message implements Event, Protocol {
 
 	
-	private int eventType; 
+	private int eventType = MESSAGE; 
 	private int msgpayload; 
 	
-	private int count;
+	//private int count;
 	 
-	private String[] path; 
+	private LinkedList<Vertex> path; 
 	
-	public Message(int payload, String[] route) {
+	public Message() {
+		path = new LinkedList<Vertex>(); 
+	}
+	
+	public Message(int payload, LinkedList<Vertex> route) {
 		msgpayload = payload; 
 		path = route; 
-		count = path.length; 
-		eventType = MESSAGE; 
+		//count = path.length; 
+		//eventType = MESSAGE; 
 	
 	}
 	
@@ -33,14 +39,15 @@ public class Message implements Event, Protocol {
 		
 		eventType = din.readInt(); 
 		msgpayload = din.readInt(); 
-		count = din.readInt(); 
-		path = new String[count];
+		int count = din.readInt(); 
+		//path = new String[count];
 		
 		for (int i = 0; i < count; i++) {
 			int idlength = din.readInt(); 
 			byte[] idbytes = new byte[idlength];
 			din.readFully(idbytes);
-			path[i] = new String(idbytes);
+			Vertex v = new Vertex(idbytes);
+			path.add(v);
 		}
 		
 		bainput.close(); 
@@ -52,7 +59,22 @@ public class Message implements Event, Protocol {
 		
 		return eventType;
 	}
+	
+	public int getPayload() {
+		return msgpayload; 
+	}
 
+	public void setPayload(int payload) {
+		msgpayload = payload; 
+	}
+	
+	public LinkedList<Vertex> getPath() {
+		return path; 
+	}
+	
+	public void setPath(LinkedList<Vertex> path) {
+		this.path = path; 
+	}
 	@Override
 	public byte[] getBytes() throws IOException {
 		byte[] marshalledBytes = null; 
@@ -62,17 +84,16 @@ public class Message implements Event, Protocol {
 		
 		dout.writeInt(eventType);
 		dout.writeInt(msgpayload);
-		dout.writeInt(count);
+		dout.writeInt(path.size());
 		//dout.writeInt(length);
 		
-		for (int i = 0; i < count; i++) {
-			byte[] idbytes = path[i].getBytes(); 
+		for (Vertex v : path) {
+			byte[] idbytes = v.getBytes(); 
 			int length = idbytes.length; 
-			
 			dout.writeInt(length);
 			dout.write(idbytes);
-			
 		}
+	
 		//dout.write(idbytes)
 		
 		dout.flush(); 
@@ -83,16 +104,9 @@ public class Message implements Event, Protocol {
 		baoutput.close(); 
 		dout.close(); 
 		
-		return null;
+		return marshalledBytes;
 	}
 
-	public String getDestination() {
-		if (path.length > 1) {
-			return path[path.length - 1];
-		}
-		else 
-			return "Destination is undefined."; 
-	}
 	
 	@Override
 	public Event createNewEvent(byte[] info) throws IOException {

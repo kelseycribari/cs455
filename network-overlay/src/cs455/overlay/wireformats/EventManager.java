@@ -11,7 +11,9 @@ public class EventManager {
 	}
 	
 	public void handleRegistrationReponse(RegistrationResponse response) {
+		System.out.println("TEST: Event manager, Registration Response handler");
 		byte status = response.getStatus(); 
+		//System.out.println("Status: " + status); = -1 for some reason? 
 		if (status != 0) {
 			System.err.println("Registration failed.");
 			

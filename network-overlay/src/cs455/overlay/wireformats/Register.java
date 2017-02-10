@@ -17,9 +17,10 @@ public class Register implements Event, Protocol {
 	private int linkWeight; 
 	
 	
-	public Register(String IPaddr, int lPort) {
+	public Register(String IPaddr, int lPort, int linkWeight) {
 		IP = IPaddr; 
 		locport = lPort; 
+		this.linkWeight = linkWeight; 
 		//serverPort = sPort; 
 		//eventType = REGISTER_REQUEST; 
 		System.out.println("Register Request created!");
@@ -32,9 +33,13 @@ public class Register implements Event, Protocol {
 		DataInputStream din = new DataInputStream(new BufferedInputStream(bainput));
 		
 		//get event type
-		this.eventType = din.readInt(); 
+		int type = din.readInt(); 
 		
-		System.out.println(eventType);
+		if (type != eventType) {
+			System.out.println("Invalid type.");
+		}
+		
+		//System.out.println(eventType);
 		//first allocate size, then create byte array based on length 
 		int length = din.readInt(); 
 		byte[] idbytes = new byte[length];
@@ -42,7 +47,8 @@ public class Register implements Event, Protocol {
 		
 		IP = new String(idbytes);
 		locport = din.readInt();
-		Register register = new Register(IP, locport);
+		linkWeight = din.readInt(); 
+		//Register register = new Register(IP, locport);
 		//serverPort = din.readInt(); 
 		
 		bainput.close(); 
@@ -102,6 +108,8 @@ public class Register implements Event, Protocol {
 		
 		dout.write(locport);
 		//dout.write(serverPort);
+		dout.writeInt(locport);
+		dout.writeInt(linkWeight);
 		dout.flush(); 
 		
 		marshalledBytes = baoutput.toByteArray(); 

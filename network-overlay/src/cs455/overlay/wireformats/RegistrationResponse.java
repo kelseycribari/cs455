@@ -11,7 +11,7 @@ import java.io.IOException;
 public class RegistrationResponse implements Event, Protocol {
 
 	
-	private int eventType; 
+	private final int eventType = REGISTRATION_RESPONSE; 
 	private String information; 
 	private byte status; 
 	
@@ -22,7 +22,7 @@ public class RegistrationResponse implements Event, Protocol {
 	public RegistrationResponse(String info, byte status) {
 		information = info; 
 		this.status = status; 
-		eventType = REGISTRATION_RESPONSE; 
+		//eventType = REGISTRATION_RESPONSE; 
 	}
 	
 	public RegistrationResponse(byte[] marshalledBytes) throws IOException {
@@ -31,7 +31,11 @@ public class RegistrationResponse implements Event, Protocol {
 		DataInputStream din = new DataInputStream(new BufferedInputStream(bainput));
 		
 		//get event type from datainputstream
-		eventType = din.readInt(); 
+		int type = din.readInt();  
+		if (type != eventType) {
+			System.out.println("Invalid event.");
+			return; 
+		}
 		status = din.readByte(); 
 		//get length
 		int length = din.readInt();
@@ -78,14 +82,14 @@ public class RegistrationResponse implements Event, Protocol {
 		DataOutputStream dout = new DataOutputStream(new BufferedOutputStream(baoutput));
 		
 		dout.writeInt(eventType);
-		
+		dout.writeByte(status);
 		
 		byte[] idbytes = information.getBytes(); 
 		int length = idbytes.length; 
 		dout.writeInt(length);
 		dout.write(idbytes);
 		
-		dout.writeByte(status);
+		
 		
 		dout.flush(); 
 		

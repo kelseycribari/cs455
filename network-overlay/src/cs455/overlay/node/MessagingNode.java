@@ -7,8 +7,10 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.rmi.UnknownHostException;
 import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.Scanner;
 
+import cs455.overlay.dijkstra.Vertex;
 import cs455.overlay.transport.Connection;
 import cs455.overlay.transport.ConnectionsHandler;
 import cs455.overlay.transport.TCPServerThread;
@@ -16,6 +18,9 @@ import cs455.overlay.wireformats.Deregister;
 import cs455.overlay.wireformats.DeregistrationResponse;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.EventManager;
+import cs455.overlay.wireformats.LinkRequest;
+import cs455.overlay.wireformats.LinkWeights;
+import cs455.overlay.wireformats.Message;
 import cs455.overlay.wireformats.Protocol;
 import cs455.overlay.wireformats.Register;
 import cs455.overlay.wireformats.RegistrationResponse;
@@ -33,6 +38,12 @@ public class MessagingNode implements Node {
 	private int linkWeight; 
 	
 	EventManager eventManager; 
+	
+	private int sendTracker; 
+	private long sendSummation; 
+	private int receiveTracker; 
+	private long receiveSummation; 
+	private int relayTracker; 
 	
 	
 	private boolean registered; 
@@ -53,6 +64,13 @@ public class MessagingNode implements Node {
 		//sets the localHostAddr by getting the InetAddress.getLocalHost().getHostName() --which converts that InetAddress into a String 
 		setLocalHostAddress();
 		
+		sendTracker = 0; 
+		sendSummation = 0; 
+		receiveTracker = 0; 
+		receiveSummation = 0; 
+		relayTracker = 0; 
+		
+		eventManager = new EventManager(this);
 		
 		//eventManager = new EventManager(); 
 		
@@ -139,17 +157,76 @@ public class MessagingNode implements Node {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			break; 
 		}
 		
 		case Protocol.REGISTRATION_RESPONSE: {
 			RegistrationResponse registrationResponse = (RegistrationResponse) event; 
+			System.out.println("Registration Response event type: " + registrationResponse.getEventType());
 			eventManager.handleRegistrationReponse(registrationResponse);
+			break; 
 		}
 		
 		case Protocol.DEREGISTRATION_RESPONSE: {
 			DeregistrationResponse deregResponse = (DeregistrationResponse) event; 
 			eventManager.handleDeregistrationResponse(deregResponse);
+			break; 
 		}
+		
+		case Protocol.LINK_REQUEST: {
+			LinkRequest linkRequest = (LinkRequest) event; 
+			
+			try {
+				Socket link = new Socket(linkRequest.getIP(), linkRequest.getPort());
+				Connection linkConnection = new Connection(link, this);
+				linkConnection.setLinkWeight(linkRequest.getWeight());
+				linkConnection.setListeningPort(linkRequest.getPort());
+				requestRegistration(linkConnection, linkConnection.getLinkWeight());
+				
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			break; 
+		}
+		
+		case Protocol.LINK_WEIGHTS: {
+			LinkWeights linkWeights = (LinkWeights) event;
+			//routing_registry stuff
+			
+			break; 
+			
+		}
+		
+		case Protocol.MESSAGE: {
+			Message message = (Message) event; 
+			
+			LinkedList<Vertex> path = message.getPath(); 
+			//retreives and removes head (first element) of the list 
+			path.poll(); 
+			
+			if (path.isEmpty()) { //means that you've reached the destination 
+				receiveTracker++; 
+				receiveSummation += message.getPayload(); 
+			}
+			else {
+				relayTracker++; 
+				Vertex next = path.element(); 
+				Connection c = connections.get(next.getIP() + ":" + next.getListeningPort());
+				
+				Message nextMessage = new Message(message.getPayload(), path);
+				
+				//send the message
+				try {
+					c.sendData(nextMessage.getBytes());
+				} catch(IOException e) {
+					e.printStackTrace();
+				}
+			}
+			break; 
+		}
+		
+		
 		
 		
 		}
@@ -207,7 +284,7 @@ public class MessagingNode implements Node {
 	
 	//send's a registration request 
 	public void requestRegistration(Connection c, int linkWeight) {
-		Register register = new Register(localHostAddr, localPort); //include link weights
+		Register register = new Register(localHostAddr, localPort, -1); //include link weights
 		try {
 			c.sendData(register.getBytes());
 		} catch (IOException e) {

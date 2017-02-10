@@ -8,31 +8,32 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class TaskComplete implements Event, Protocol {
+public class LinkRequest implements Event, Protocol {
 
-	private final int eventType = TASK_COMPLETE; 
-	private int port; 
+	private final int eventType = LINK_REQUEST; 
+	
 	private String IP; 
+	private int port; 
+	private int weight; 
 	
-	
-	public TaskComplete() {
+	public LinkRequest() {
 		IP = new String(); 
 	}
 	
-	public TaskComplete(int port, String IP) {
-		this.port = port; 
+	public LinkRequest(String IP, int port, int weight) {
 		this.IP = IP; 
+		this.port = port; 
+		this.weight = weight; 
 	}
 	
-	public TaskComplete(byte[] marshalledBytes) throws IOException {
-		ByteArrayInputStream bainput = new ByteArrayInputStream(marshalledBytes);
+	public LinkRequest(byte[] marshalledBytes) throws IOException {
+		ByteArrayInputStream bainput = new ByteArrayInputStream(marshalledBytes); 
 		DataInputStream din = new DataInputStream(new BufferedInputStream(bainput));
 		
-		
 		int type = din.readInt(); 
-		if (eventType != type) {
+		if (type != eventType) {
 			System.out.println("Invalid event.");
-			return; 
+			return;
 		}
 		
 		int length = din.readInt(); 
@@ -41,6 +42,7 @@ public class TaskComplete implements Event, Protocol {
 		
 		IP = new String(bytes);
 		port = din.readInt(); 
+		weight = din.readInt(); 
 		
 		
 		bainput.close(); 
@@ -49,26 +51,9 @@ public class TaskComplete implements Event, Protocol {
 	
 	@Override
 	public int getEventType() {
-		
 		return eventType;
 	}
-	
-	public String getIP() {
-		return IP; 
-	}
-	
-	public void setIP(String ip) {
-		IP = ip; 
-	}
-	
-	public int getPort() {
-		return port; 
-	
-	}
 
-	public void setPort(int port) {
-		this.port = port; 
-	}
 	@Override
 	public byte[] getBytes() throws IOException {
 		byte[] marshalledBytes = null; 
@@ -85,17 +70,44 @@ public class TaskComplete implements Event, Protocol {
 		dout.write(bytes);
 		
 		dout.writeInt(port);
+		dout.writeInt(weight);
+		
 		dout.flush(); 
 		
 		marshalledBytes = baout.toByteArray(); 
-		//need to do this twice?? 
+		
 		baout.close(); 
 		dout.close(); 
+		return marshalledBytes; 
 		
-		
-		return marshalledBytes;
 	}
 
+	public String getIP() {
+		return IP; 
+	}
+	
+	public void setIP(String ip) {
+		IP = ip; 
+	}
+	
+	public int getPort() {
+		return port; 
+		
+	}
+	
+	public void setPort(int port) {
+		this.port = port; 
+	}
+	
+	public int getWeight() {
+		return weight; 
+	}
+	
+	public void setWeight(int weight) {
+		this.weight = weight; 
+	}
+	
+	
 	@Override
 	public Event createNewEvent(byte[] info) throws IOException {
 		// TODO Auto-generated method stub
