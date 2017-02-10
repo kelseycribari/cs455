@@ -28,8 +28,8 @@ public class Connection {
 	private TCPSender tcpsender; 
 	
 	//private int localPort; //new node connects with this n using this port
-	private int inetPort; //remote node connection for new node 
-	private String ID; 
+	//private int inetPort; //remote node connection for new node 
+	//private String ID; 
 	
 	
 	public Connection(Socket socket, Node node) throws IOException {

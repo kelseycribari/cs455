@@ -18,6 +18,8 @@ public interface Protocol {
 	public static final int TASK_SUMMARY_REQUEST = 4008; 
 	public static final int TASK_SUMMARY_RESPONSE = 4009; 
 	public static final int MESSAGE = 4010; 
+	public static final int LINK_RESPONSE = 4011; 
+	public static final int LINK_REQUEST = 4012; 
 	
 	
 }

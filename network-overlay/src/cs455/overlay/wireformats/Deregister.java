@@ -13,10 +13,10 @@ public class Deregister implements Event, Protocol {
 	
 	//private int eventType;
 	//IP address of the node to be deregistered
-	private String nodeIP; 
+	private String IP; 
 	//port of the node to be deregistered
-	private int nodePort; 
-	private int eventType = DEREGISTER_REQUEST; 
+	private int port; 
+	private final int eventType = DEREGISTER_REQUEST; 
 	
 	public Deregister(byte[] marshalledBytes) throws IOException {
 		//eventType = DEREGISTER_REQUEST; 
@@ -35,8 +35,8 @@ public class Deregister implements Event, Protocol {
 		byte[] IPbytes = new byte[IPlength];
 		din.readFully(IPbytes);
 		
-		nodeIP = new String(IPbytes);
-		nodePort = din.readInt(); 
+		IP = new String(IPbytes);
+		port = din.readInt(); 
 		
 		
 		//close the bytearrayinputstream and the datainputstream
@@ -46,8 +46,8 @@ public class Deregister implements Event, Protocol {
 	}
 	
 	public Deregister(int port, String IP) {
-		nodePort = port; 
-		nodeIP = IP; 
+		this.port = port; 
+		this.IP = IP; 
 		
 	}
 	
@@ -69,12 +69,12 @@ public class Deregister implements Event, Protocol {
 		
 		dout.writeInt(eventType);
 		
-		byte[] IPbytes = nodeIP.getBytes(); 
+		byte[] IPbytes = IP.getBytes(); 
 		int length = IPbytes.length; 
 		dout.writeInt(length);
 		dout.write(IPbytes);
 		
-		dout.writeInt(nodePort);
+		dout.writeInt(port);
 		
 		dout.flush(); 
 		marshalledBytes = baoutput.toByteArray(); 
@@ -87,19 +87,19 @@ public class Deregister implements Event, Protocol {
 	}
 	
 	public String getNodeIP() {
-		return nodeIP; 
+		return IP; 
 	}
 	
 	public void setNodeIP(String ip) {
-		nodeIP = ip; 
+		IP = ip; 
 	}
 	
 	public int getNodePort() {
-		return nodePort; 
+		return port; 
 	}
 
 	public void setNodePort(int port) {
-		nodePort = port; 
+		port = port; 
 	}
 	
 	@Override

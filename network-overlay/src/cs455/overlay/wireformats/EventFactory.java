@@ -13,9 +13,9 @@ public class EventFactory {
 		return eFactory; 
 	}
 	
-	public synchronized static Event createNewEvent(byte[] info) {
+	public synchronized static Event createEvent(byte[] info) {
 		
-		Event event = null; 
+		//Event event = null; 
 		
 		try {
 			
@@ -32,8 +32,8 @@ public class EventFactory {
 			switch(eventType) {
 			
 				case Protocol.REGISTER_REQUEST: {
-					event = new Register(info);
-					System.out.println(event);
+					//event = new Register(info);
+					//System.out.println(event);
 					
 					return new Register(info);
 					
@@ -59,43 +59,43 @@ public class EventFactory {
 					
 				}
 				
-				/*case Protocol.MESSAGING_NODES_LIST: {
+				case Protocol.MESSAGING_NODES_LIST: {
 					//event = new MessagingNodesList(info);
 					break;
 				}
 				
 				case Protocol.LINK_WEIGHTS: {
-					//event = new LinkWeights(info);
-					break; 
+					return new LinkWeights(info);
+					 
 				}
 				
 				case Protocol.TASK_INITIATE: {
-					//event = new TaskInitiate(info);
-					break; 
+					return new TaskInitiate(info);
+					//break; 
 				}
 				
 				case Protocol.TASK_COMPLETE: {
-					//event = new TaskComplete(info);
-					break;
+					return new TaskComplete(info);
+					//break;
 				}
 				
 				case Protocol.TASK_SUMMARY_REQUEST: {
-					//event = new TaskSummaryRequest(info);
-					break; 
+					return new TaskSummaryRequest(info);
+					//break; 
 				}
 				
 				case Protocol.TASK_SUMMARY_RESPONSE: {
-					//event = new TaskSummaryResponse(info);
-					break; 
+					return new TaskSummaryResponse(info);
+					//break; 
 				}
-				*/
+				
 				case Protocol.MESSAGE: {
 					return new Message(info); 
 				
 				}
 				
 				default: {
-					return null; 
+					return new Message(); 
 					 
 				}
 			}
@@ -103,9 +103,12 @@ public class EventFactory {
 			
 			
 		} catch (IOException e) {
-			
+			for (byte b : info) {
+				System.out.println(Integer.toHexString(b));
+			}
+			e.printStackTrace();
 		}
-		return event;
+		return null;
 		 
 	}
 	

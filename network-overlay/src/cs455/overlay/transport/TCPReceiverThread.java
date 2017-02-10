@@ -32,13 +32,14 @@ public class TCPReceiverThread extends Thread {
 		while(socket != null) {
 			try {
 				int length = din.readInt(); 
+				System.out.println("TCPReceiverThread run(): length:" + length); 
 				
 				if (length > 0) {
 					byte[] data = new byte[length];
 					din.readFully(data, 0, length);
-					System.out.println(data);
-					Event e = EventFactory.createNewEvent(data);
-					System.out.println("Inside TCPReceiverThread's run.");
+					//System.out.println("TCPRecevierThread data: " + data);
+					Event e = EventFactory.createEvent(data);
+					System.out.println("Inside TCPReceiverThread's run." + e.getEventType());
 					System.out.println(e);
 					//String nodeID = new String(socket.getInetAddress().toString() + ":" + socket.getPort());
 					node.onEvent(e, socket);
