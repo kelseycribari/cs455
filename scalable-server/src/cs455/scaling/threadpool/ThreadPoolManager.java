@@ -16,7 +16,7 @@ public class ThreadPoolManager {
 		
 		threadPool = new Thread[this.numberThreads];
 		for (int i = 0; i < this.numberThreads; i++) {
-			threadPool[i] = new Thread(new Handler(blockingQueue));
+			threadPool[i] = new Thread(new Worker(blockingQueue));
 			
 		}	
 	}
@@ -24,7 +24,7 @@ public class ThreadPoolManager {
 	/*
 	 * initializes the threadPoolManager, and only starts the threads if the threadPoolManager hasn't already been initialized 
 	 */
-	public void inititalize() {
+	public void initialize() {
 		synchronized(threadPool) {
 			//checks to see if this threadPoolManager has already been initialized by checking the thread state
 			//if it has, then this method does nothing 

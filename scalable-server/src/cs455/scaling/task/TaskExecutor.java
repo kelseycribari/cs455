@@ -2,6 +2,12 @@ package cs455.scaling.task;
 
 import cs455.scaling.threadpool.BlockingQueue;
 
+/*
+ * Author: Kelsey Cribari 
+ * Deprecated, all this can be done in the ThreadPoolManager
+ * Date: 2-10-17
+ */
+
 public class TaskExecutor implements Runnable {
 	
 	BlockingQueue queue; 

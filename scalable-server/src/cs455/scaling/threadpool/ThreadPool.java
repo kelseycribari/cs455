@@ -2,6 +2,12 @@ package cs455.scaling.threadpool;
 
 import cs455.scaling.task.TaskExecutor;
 
+/*
+ * Author: Kelsey Cribari 
+ * Deprecated, don't need this, can just store the threads in a Thread[] inside the ThreadPoolManager. 
+ * Date: 2-10-17
+ */
+
 public class ThreadPool {
 	
 	BlockingQueue queue; 

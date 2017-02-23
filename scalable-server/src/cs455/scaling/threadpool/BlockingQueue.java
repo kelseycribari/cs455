@@ -3,6 +3,12 @@ package cs455.scaling.threadpool;
 import java.util.LinkedList;
 import java.util.Queue;
 
+
+/*
+ * Author: Kelsey Cribari 
+ * Deprecated, not necessary to use this because the synchronization is handled directly in the method (decreases the scope of the synchronization)
+ * Date: 2-10-17
+ */
 public class BlockingQueue {
 	
 	private Queue queue = new LinkedList(); 
