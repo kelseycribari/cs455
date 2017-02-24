@@ -1,8 +1,10 @@
 package cs455.scaling.server;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -143,10 +145,33 @@ public class Server {
 	
 	
 	public static void main(String[] args) {
+		int port = 0; 
+		int threadPoolSize = 0; 
 		
 		if (args.length != 2) {
 			System.err.println("SERVER ERROR: Invalid arguments. Please input a portnumber and a thread pool size.");
 			System.exit(0);
+		}
+		else {
+			port = Integer.parseInt(args[0]);
+			threadPoolSize = Integer.parseInt(args[1]);
+		}
+		
+		try {
+			System.out.println("Server started on: " + InetAddress.getLocalHost().getHostName() + " using port: " + port); 
+			
+		} catch (UnknownHostException uhe) {
+			uhe.printStackTrace();
+		}
+		
+		Server server = null; 
+		
+		try {
+			server = new Server(port, threadPoolSize);
+			server.initSelector();
+			server.begin(); 
+		} catch (IOException ie) {
+			ie.printStackTrace();
 		}
 	}
 	
