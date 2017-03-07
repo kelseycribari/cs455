@@ -1,0 +1,1 @@
+terminator "ssh -t peanut.cs.colostate.edu 'echo 'helloworld!'; cd ~/workspace/cs455/scalable-server/src; java cs455.scaling.server.Server 7077 100;bash '" & 

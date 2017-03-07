@@ -15,14 +15,15 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
+//import java.util.concurrent.ThreadLocalRandom;
 
 
 /*
  * Author: Kelsey Cribari 
- * At least 100 clients created at one time. 
+ * Allow for at least 100 clients created at a time.
  * The goal of a client is to maintain an active connection to the server, regularly send data packets of 8KB to the server.
  * It also tracks the hashcodes of the data packets that it sends to the server. 
- * It can also receive the hashcodes from the server to indicate that the packets have been received. 
+ * It can also receive the hashcodes from the server to indicate that the packets have been received. (done in the ResponseHandler thread)
  */
 
 public class Client {
@@ -30,9 +31,10 @@ public class Client {
 	private static final int PACKET_SIZE = 8192;
 	private SocketChannel socketChannel; 
 	
-	private InetAddress serverHost; 
-	private int serverPort; 
-	private int messageRate; 
+	//private InetAddress serverHost;
+	//private String serverHost; 
+	//private int serverPort; 
+	public int messageRate; 
 	
 	private LinkedList<String> pendingHashes; 
 	private Selector selector; 
@@ -42,13 +44,16 @@ public class Client {
 	
 	
 	
-	public Client(InetAddress serverHost, int serverPort, int messageRate) throws IOException {
-		this.serverHost = serverHost; 
-		this.serverPort = serverPort; 
+	public Client(int messageRate) throws IOException {
+		socketChannel = SocketChannel.open(); 
+		responseHandler = new ResponseHandler(socketChannel); 
+		//this.serverHost = serverHost; 
+		//this.serverPort = serverPort; 
 		this.messageRate = messageRate; 
-		pendingHashes = new LinkedList<String>(); 
-		selector = Selector.open(); 
-		this.initiateConnection(); 
+		//pendingHashes = new LinkedList<String>(); 
+		//responseHandler = new ResponseHandler(socketChannel);
+		//selector = Selector.open(); 
+		//this.initiateConnection(); 
 		//socketChannel.configureBlocking(false); 
 		
 	}
@@ -89,15 +94,21 @@ public class Client {
 //		
 //	}
 	
-	public void initiateConnection() throws IOException {
+	public void initiateConnection(String serverIP, int serverPort) throws IOException {
 		System.out.println("Connecting client to server.");
 		
-		socketChannel = SocketChannel.open(); 
-		socketChannel.configureBlocking(false); 
+		//socketChannel = SocketChannel.open(); 
+		//socketChannel.configureBlocking(false); 
 		
-		InetSocketAddress isa = new InetSocketAddress(serverHost, serverPort); 
-		socketChannel.connect(isa);
-		socketChannel.register(selector, SelectionKey.OP_CONNECT);
+		
+		
+		//InetSocketAddress isa = new InetSocketAddress(serverIP, serverPort); 
+		socketChannel.connect(new InetSocketAddress(serverIP, serverPort));
+		//socketChannel.register(selector, SelectionKey.OP_CONNECT);
+		//System.out.println(socketChannel.isConnected());
+		//responseHandler = new ResponseHandler(socketChannel);
+		System.out.println("Client conencted to: " + serverIP + " on port: " + serverPort);
+		//System.out.println(socketChannel.toString());
 		new Thread(responseHandler).start(); 
 	}
 	
@@ -156,7 +167,7 @@ public class Client {
 //	}
 	
 	
-	public void startSending() {
+	public void start() throws NoSuchAlgorithmException {
 		System.out.println("Client started sending messages at a rate of " + messageRate + " per second.");
 		
 		while(!Thread.interrupted()) {
@@ -176,18 +187,31 @@ public class Client {
 	}
 	
 	
-	private void send() throws IOException {
+	private void send() throws IOException, NoSuchAlgorithmException {
 		
 		byte[] packet = new byte[PACKET_SIZE];
 		
 		new Random().nextBytes(packet); 
-		String hash = null; 
+		//ThreadLocalRandom.current().nextBytes(packet);
+		//String hash = null; 
+		
+		MessageDigest digest = null; 
 		try {
-			hash = SHA1FromBytes(packet); 
-			responseHandler.addPending(hash);
-		} catch(NoSuchAlgorithmException nsae) {
-			nsae.printStackTrace();
+			digest = MessageDigest.getInstance("SHA1");
+		} catch (NoSuchAlgorithmException nsae) {
+			nsae.printStackTrace(); 
 		}
+		
+		byte[] hash = digest.digest(packet);
+		responseHandler.addPending(hash);
+		
+//		try {
+//			hash = SHA1FromBytes(packet); 
+//			System.out.println(responseHandler.toString());
+//			responseHandler.addPending(hash);
+//		} catch(NoSuchAlgorithmException nsae) {
+//			nsae.printStackTrace();
+//		}
 		
 		ByteBuffer byteBuffer = ByteBuffer.allocate(PACKET_SIZE);
 		byteBuffer.put(packet);
@@ -196,7 +220,11 @@ public class Client {
 		while(byteBuffer.hasRemaining()) {
 			socketChannel.write(byteBuffer);
 		}
-		System.out.println("Sent " + hash + " to the Server.");
+		BigInteger printHashInteger = new BigInteger(1, hash);
+		String printHashString = printHashInteger.toString(16); 
+		System.out.println("Sent " + printHashString + " to the Server.");
+		
+		
 		
 	}
 	
@@ -209,9 +237,9 @@ public class Client {
 	}
 	
 	
-	public static void main (String args[]) throws UnknownHostException {
+	public static void main (String args[]) throws UnknownHostException, NoSuchAlgorithmException {
 		
-		InetAddress hostName = null; 
+		String hostName = null; 
 		int serverPort = 0; 
 		int msgRate = 0; 
 		
@@ -221,23 +249,26 @@ public class Client {
 			System.exit(0);
 		}
 		else {
-			try {
-				hostName = InetAddress.getByName(args[0]);
-			} catch (UnknownHostException e) {
-				e.printStackTrace();
-			}
+			//try {
+				//hostName = InetAddress.getByName(args[0]);
+				hostName = args[0];
+			//} catch (UnknownHostException e) {
+				//e.printStackTrace();
+			//}
 			serverPort = Integer.parseInt(args[1]);
 			msgRate = Integer.parseInt(args[2]);
 			
 		}
 		Client client = null; 
 		try {
-			client = new Client(hostName, serverPort, msgRate);
+			client = new Client(msgRate);
+			client.initiateConnection(hostName, serverPort);
 		} catch (IOException e) {
 			e.printStackTrace(); 
 		}
 		
-		client.startSending(); 
+		client.start(); 
+		
 		
 		
 	}

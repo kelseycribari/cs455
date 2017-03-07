@@ -35,10 +35,13 @@ public class ChannelUtil {
 	
 	public List<byte[]> getBytesWaiting() {
 		List<byte[]> waiting = new ArrayList<byte[]>(); 
-		for (byte[] b : bytesWaiting){
-			waiting.add(b);
+		synchronized(bytesWaiting) {
+			for (byte[] b : bytesWaiting){
+				waiting.add(b);
+			}
+			bytesWaiting.clear(); 
 		}
-		bytesWaiting.clear(); 
+		
 		
 		return waiting; 
 	}
@@ -53,7 +56,7 @@ public class ChannelUtil {
 		isWriting = writing; 
 	}
 	public boolean isWriting() {
-		return isWriting(); 
+		return isWriting; 
 	}
 	
 }

@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import cs455.scaling.task.Task;
 
 public class ThreadPoolManager {
+	private static final int THREADS_NUMBER_DEFAULT = 10; 
 	
 	private Thread[] threadPool; 
 	private LinkedList<Task> blockingQueue; 
@@ -12,7 +13,11 @@ public class ThreadPoolManager {
 	
 	
 	public ThreadPoolManager(int numberThreads) {
+		blockingQueue = new LinkedList<Task>(); 
+		if (numberThreads <= 0)
+			numberThreads = THREADS_NUMBER_DEFAULT; 
 		this.numberThreads = numberThreads; 
+		
 		
 		threadPool = new Thread[this.numberThreads];
 		for (int i = 0; i < this.numberThreads; i++) {
@@ -42,6 +47,8 @@ public class ThreadPoolManager {
 		for (Thread thread : threadPool) {
 			thread.start(); 
 		}
+		
+		System.out.println("ThreadPoolManager: Threads started");
 	}
 	
 	/*

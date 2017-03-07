@@ -36,7 +36,7 @@ public class Worker implements Runnable {
 					try {
 						readyTasksQueue.wait(); 
 					} catch(InterruptedException e) {
-						e.printStackTrace(); 
+						//e.printStackTrace(); 
 						return; 
 					}
 				}
