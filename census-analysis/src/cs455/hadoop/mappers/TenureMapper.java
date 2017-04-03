@@ -11,10 +11,6 @@ import cs455.hadoop.util.ParsingUtil;
 
 public class TenureMapper extends Mapper<LongWritable, Text, Text, TenureRecord>{
 	
-	/*
-	 * c(non-Javadoc)
-	 * @see org.apache.hadoop.mapreduce.Mapper#map(KEYIN, VALUEIN, org.apache.hadoop.mapreduce.Mapper.Context)
-	 */
 	@Override
 	protected void map(LongWritable keyIn, Text valueIn, Context context) {
 		
@@ -29,7 +25,7 @@ public class TenureMapper extends Mapper<LongWritable, Text, Text, TenureRecord>
 			Long logicalRecordPartNumber = ParsingUtil.logicalRecordPartNumber(text);
 			Long totalPartsInRecord = ParsingUtil.totalPartsInRecord(text);
 			
-			if (logicalRecordPartNumber == totalPartsInRecord) {
+			if (logicalRecordPartNumber.equals(totalPartsInRecord)) {
 				tenureRecord.setLogicalPartNumber(logicalRecordPartNumber);
 				tenureRecord.setTotalPartsInRecord(totalPartsInRecord);
 				

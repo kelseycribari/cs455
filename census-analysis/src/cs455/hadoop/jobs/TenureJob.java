@@ -30,8 +30,10 @@ public class TenureJob {
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(TenureRecord.class);
 		
-		FileInputFormat.addInputPath(job, new Path(args[0]));
-		FileOutputFormat.setOutputPath(job, new Path(args[1]));
+		Path inputPath = new Path(args[0]);
+		FileInputFormat.addInputPath(job, inputPath);
+		Path outputPath = new Path(args[1]);
+		FileOutputFormat.setOutputPath(job, outputPath);
 		
 		System.exit(job.waitForCompletion(true) ? 0 : 1);
 		
