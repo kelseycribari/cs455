@@ -20,7 +20,7 @@ public class TenureMapper extends Mapper<LongWritable, Text, Text, TenureRecord>
 		String summaryLevel = ParsingUtil.summaryLevel(text);
 		
 		//Make sure the summary level is 100 before proceeding
-		if (summaryLevel == "100") {
+		if (summaryLevel.equals("100")) {
 			String state = ParsingUtil.state(text);
 			Long logicalRecordPartNumber = ParsingUtil.logicalRecordPartNumber(text);
 			Long totalPartsInRecord = ParsingUtil.totalPartsInRecord(text);

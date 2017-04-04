@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Writable;
 
 public class MarriageRecord implements Writable {
@@ -14,7 +15,6 @@ public class MarriageRecord implements Writable {
 	private long totalPopulation = 0; 
 	private long unmarriedFemales = 0; 
 	private long unmarriedMales = 0; 
-	
 	
 	
 	public long getLogicalRecordPartNumber() {
@@ -50,10 +50,12 @@ public class MarriageRecord implements Writable {
 	}
 	
 	public double getMalesPercentage() {
-		return (getUnmarriedMales() / getPopulation()) * 100;  
+		double population = getUnmarriedMales() + getUnmarriedFemales(); 
+		return (getUnmarriedMales() / population) * 100;  
 	}
 	public double getFemalesPercentage() {
-		return (getUnmarriedFemales() / getPopulation()) * 100; 
+		double population = getUnmarriedMales() + getUnmarriedFemales(); 
+		return (getUnmarriedFemales() / population) * 100; 
 	}
 	
 	
@@ -92,5 +94,6 @@ public class MarriageRecord implements Writable {
 		return sb.toString(); 
 		
 	}
+	
 
 }
