@@ -49,13 +49,11 @@ public class MarriageRecord implements Writable {
 		this.unmarriedMales = males; 
 	}
 	
-	public double getMalesPercentage() {
-		double population = getUnmarriedMales() + getUnmarriedFemales(); 
-		return (getUnmarriedMales() / population) * 100;  
+	public double getMalesPercentage() { 
+		return (getUnmarriedMales() / getPopulation()) * 100;  
 	}
 	public double getFemalesPercentage() {
-		double population = getUnmarriedMales() + getUnmarriedFemales(); 
-		return (getUnmarriedFemales() / population) * 100; 
+		return (getUnmarriedFemales() / getPopulation()) * 100; 
 	}
 	
 	
