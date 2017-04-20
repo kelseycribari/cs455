@@ -38,8 +38,6 @@ public class RuralUrbanMapper extends Mapper<LongWritable, Text, Text, RuralUrba
 				
 				context.write(new Text(state), ruralUrbanRecord);
 				
-				
-				
 			}
 		}
 	}
