@@ -12,8 +12,8 @@ public class ChildcareCombiner extends Reducer<Text, ChildcareRecord, Text, Chil
 	
 	@Override
 	protected void reduce(Text key, Iterable<ChildcareRecord> values, Context context) throws IOException, InterruptedException {
-		Long population13AndUnder = 0l; 
-		Long totalPopulation = 0l; 
+		double population13AndUnder = 0l; 
+		double totalPopulation = 0l; 
 		
 		
 		for (ChildcareRecord record : values) {

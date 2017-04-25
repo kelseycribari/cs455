@@ -12,8 +12,8 @@ public class ChildcareRecord implements Writable {
 	private long logicalRecordPartNumber = 0; 
 	private long totalPartsInRecord = 0; 
 	
-	private long totalPopulation = 0; 
-	private long population13AndUnder = 0; 
+	private double totalPopulation = 0; 
+	private double population13AndUnder = 0; 
 	
 	private double percent13AndUnder = 0.0; 
 	
@@ -30,30 +30,30 @@ public class ChildcareRecord implements Writable {
 		this.totalPartsInRecord = num; 
 	}
 	
-	public long getTotalPopulation() {
+	public double getTotalPopulation() {
 		return this.totalPopulation;
 	}
-	public void setTotalPopulation(long population) {
+	public void setTotalPopulation(double population) {
 		this.totalPopulation = population; 
 	}
-	public long getPopulation13AndUnder() {
+	public double getPopulation13AndUnder() {
 		return this.population13AndUnder;
 	}
-	public void setPopulation13AndUnder(long population) {
+	public void setPopulation13AndUnder(double population) {
 		this.population13AndUnder = population; 
 	}
 
 	@Override
 	public void readFields(DataInput dataInput) throws IOException {
-		population13AndUnder = dataInput.readLong(); 
-		totalPopulation = dataInput.readLong(); 
+		population13AndUnder = dataInput.readDouble(); 
+		totalPopulation = dataInput.readDouble(); 
 		
 	}
 
 	@Override
 	public void write(DataOutput dataOutput) throws IOException {
-		dataOutput.writeLong(population13AndUnder); 
-		dataOutput.writeLong(totalPopulation);
+		dataOutput.writeDouble(population13AndUnder); 
+		dataOutput.writeDouble(totalPopulation);
 		
 	}
 

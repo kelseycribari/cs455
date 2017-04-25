@@ -16,10 +16,10 @@ public class ChildcareReducer extends Reducer<Text, ChildcareRecord, Text, Doubl
 	@Override 
 	protected void reduce(Text key, Iterable<ChildcareRecord> values, Context context) {
 		
-		double currentPercent = 0.0; 
+		//double currentPercent = 0.0; 
 		
 		for (ChildcareRecord record : values) {
-			currentPercent = (record.getPopulation13AndUnder() / record.getTotalPopulation()) * 100; 
+			double currentPercent = (record.getPopulation13AndUnder() / record.getTotalPopulation()) * 100; 
 			if (currentPercent > percent13AndUnder) {
 				percent13AndUnder = currentPercent; 
 				state = key.toString(); 

@@ -25,7 +25,7 @@ public class ChildcareJob {
 		job.setJarByClass(ChildcareJob.class);
 		job.setMapperClass(ChildcareMapper.class);
 		job.setCombinerClass(ChildcareCombiner.class);
-		job.setNumReduceTasks(1);
+		//job.setNumReduceTasks(1);
 		job.setReducerClass(ChildcareReducer.class);
 		
 		job.setMapOutputKeyClass(Text.class);
